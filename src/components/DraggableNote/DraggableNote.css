@@ -1,0 +1,7 @@
+.todo-sticker__item {
+  width: 250px;
+  min-height: 80px;
+  padding: 35px 15px 15px 15px;
+  border-radius: 5px;
+  cursor: move;
+}
