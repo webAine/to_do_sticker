@@ -6,6 +6,7 @@
   height: 100vh;
   position: relative;
   overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 .todo-sticker__container {
   position: absolute;

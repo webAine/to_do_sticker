@@ -1,23 +1,75 @@
+import { useEffect, useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { useState } from 'react';
 import { CSS } from '@dnd-kit/utilities';
-import { Task } from '../../App';
-import CloseIcon from '@mui/icons-material/Close';
 import randomColor from 'randomcolor';
-import './DraggableNote.css';
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/EditNote';
+import Fab from '@mui/material/Fab';
 import { TextField } from '@mui/material';
+import { DraggableNoteProps } from '../../types/theme';
+import { createMuiStyles } from '../../styles/mui-styles';
+import './DraggableNote.css';
 
-interface DraggableNoteProps extends Task {
-  onDelete: (id: string) => void;
-  onUpdate: (id: string, newText: string) => void;
-}
-
-export const DraggableNote = ({ id, text, position, onDelete, onUpdate }: DraggableNoteProps) => {
-  const [backgroundColor] = useState<string>(() => randomColor({ luminosity: 'light' }));
+export const DraggableNote = ({
+  id,
+  text,
+  position,
+  onDelete,
+  onUpdate,
+  theme,
+  isDarkTheme,
+}: DraggableNoteProps) => {
+  const [backgroundColor, setBackgroundColor] = useState<string>(() =>
+    randomColor({
+      luminosity: isDarkTheme ? 'dark' : 'light',
+    })
+  );
+  const [isHover, setIsHover] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(text);
 
+  const muiStyles = createMuiStyles(theme);
+
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+
+  useEffect(() => {
+    setBackgroundColor(randomColor({ luminosity: isDarkTheme ? 'dark' : 'light' }));
+  }, [isDarkTheme]);
+
+  const handleEditText = () => {
+    setIsEditing(true);
+  };
+
+  const handleChangeText = (value: string) => {
+    setEditText(value);
+  };
+
+  const handleDelete = () => {
+    onDelete(id);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      onUpdate(id, editText);
+      setIsEditing(false);
+    } else if (e.key === 'Escape') {
+      setIsEditing(false);
+    }
+  };
+
+  const handleBlur = () => {
+    onUpdate(id, editText);
+    setIsEditing(false);
+  };
+
+  const onHover = () => {
+    setIsHover(true);
+  };
+
+  const onLeave = () => {
+    setIsHover(false);
+    handleBlur();
+  };
 
   const style = {
     transform: CSS.Transform.toString({
@@ -33,101 +85,65 @@ export const DraggableNote = ({ id, text, position, onDelete, onUpdate }: Dragga
     backgroundColor,
   };
 
-  const handleDoubleClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleBlur = () => {
-    if (editText.trim() !== '') {
-      onUpdate(id, editText);
-    }
-    setIsEditing(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (editText.trim() !== '') {
-        onUpdate(id, editText);
-      }
-      setIsEditing(false);
-    } else if (e.key === 'Escape') {
-      setEditText(text);
-      setIsEditing(false);
-    } else if (e.key === ' ') {
-      e.stopPropagation();
-    }
-  };
-
   return (
-    <div style={{ position: 'relative', zIndex: 3000 }}>
+    <div className='todo-sticker__list' onMouseEnter={onHover} onMouseLeave={onLeave}>
       <div
         ref={setNodeRef}
         {...listeners}
         {...attributes}
         style={style}
         className='todo-sticker__item'
-        onDoubleClick={handleDoubleClick}
+        onKeyDown={handleKeyDown}
       >
         {isEditing ? (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.stopPropagation()}
-            style={{ width: '100%', height: '100%' }}
-          >
+          <div>
             <TextField
               multiline
               fullWidth
-              variant='standard'
               value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => handleChangeText(e.target.value)}
               onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              inputProps={{ spellCheck: 'false' }}
-              sx={{
-                '& .MuiInputBase-input': {
-                  paddingBottom: '10px',
-                },
-                '& .MuiInput-underline:before': {
-                  borderBottomColor: '#222',
-                },
-                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-                  borderBottomColor: '#222',
-                },
-                '& .MuiInput-underline:hover:before': {
-                  borderBottomColor: '#222',
-                },
-                '& .MuiInput-underline:after': {
-                  borderBottomColor: '#222',
-                },
-              }}
+              variant='standard'
+              sx={muiStyles.noteTextField}
             />
           </div>
         ) : (
-          <p>{text}</p>
+          <p className='todo-sticker__text' style={{ color: theme.text }}>
+            {text}
+          </p>
         )}
       </div>
 
       <div
+        className='todo-sticker__buttons'
         style={{
-          position: 'absolute',
-          top: position.y + (transform?.y || 0) + 5,
-          left: position.x + (transform?.x || 0) + 220,
+          top: position.y + (transform?.y || 0) - 25,
+          left: position.x + (transform?.x || 0) + 180,
+          opacity: isHover ? 1 : 0,
+          transform: isHover ? 'translateY(0)' : 'translateY(100%)',
         }}
       >
-        <button onClick={() => onDelete(id)} style={{ cursor: 'pointer' }}>
-          <CloseIcon
-            sx={{
-              color: '#222',
-              transition: 'color 0.3s ease',
-              '&:hover': {
-                color: '#c00404',
-              },
-            }}
-          />
-        </button>
+        <Fab
+          size='small'
+          color='secondary'
+          aria-label='edit'
+          onClick={handleEditText}
+          className='todo-sticker__button'
+        >
+          <EditIcon />
+        </Fab>
+
+        <Fab
+          size='small'
+          color='error'
+          aria-label='delete'
+          onClick={handleDelete}
+          className='todo-sticker__button'
+        >
+          <CloseIcon />
+        </Fab>
       </div>
     </div>
   );
 };
+
