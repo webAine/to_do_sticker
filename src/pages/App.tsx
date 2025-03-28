@@ -11,6 +11,7 @@ import { Task } from '../types/theme';
 import { DraggableNote } from '../components/DraggableNote/DraggableNote';
 import { createMuiStyles } from '../styles/mui-styles';
 import './App.css';
+import randomColor from 'randomcolor';
 
 export const App = () => {
   const { theme, isDarkTheme, toggleTheme } = useTheme();
@@ -36,7 +37,12 @@ export const App = () => {
         padding + controlsHeight + Math.random() * (availableHeight - padding * 2)
       );
 
-      setTasks([...tasks, { id: uuidv4(), text: task, position: { x: randomX, y: randomY } }]);
+      setTasks([...tasks, { 
+        id: uuidv4(), 
+        text: task, 
+        position: { x: randomX, y: randomY },
+        color: randomColor({ luminosity: isDarkTheme ? 'dark' : 'light' })
+      }]);
       setTask('');
     }
   };
@@ -46,8 +52,17 @@ export const App = () => {
     console.log(tasks);
   };
 
-  const handleUpdateTask = (id: string, newText: string) => {
-    setTasks(tasks.map((task) => (task.id === id ? { ...task, text: newText } : task)));
+  const handleUpdateTask = (id: string, newText: string, newColor?: string) => {
+    setTasks(tasks.map((task) => {
+      if (task.id === id) {
+        return { 
+          ...task, 
+          text: newText,
+          ...(newColor ? { color: newColor } : {})
+        };
+      }
+      return task;
+    }));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -91,7 +106,7 @@ export const App = () => {
         <button onClick={handleAddTask}>
           <PlusIcon sx={muiStyles.addButton} />
         </button>
-        <button onClick={toggleTheme}>
+        <button className='todo-sticker__theme-button' onClick={toggleTheme}>
           {isDarkTheme ? (
             <LightModeIcon sx={muiStyles.addButton} />
           ) : (
@@ -108,6 +123,7 @@ export const App = () => {
               id={task.id}
               text={task.text}
               position={task.position}
+              color={task.color}
               onDelete={handleDeleteTask}
               onUpdate={handleUpdateTask}
               theme={theme}

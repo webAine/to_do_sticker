@@ -5,23 +5,23 @@ export const createMuiStyles = (theme: Theme) => ({
   noteTextField: {
     '& .MuiInputBase-input': {
       color: theme.text,
-      transition: 'color 0.3s ease',
+      transition: 'color 0.2s ease',
     },
     '& .MuiInput-underline:before': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
+      transition: 'border-color 0.2s ease',
     },
     '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
+      transition: 'border-color 0.2s ease',
     },
     '& .MuiInput-underline:hover:before': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
+      transition: 'border-color 0.2s ease',
     },
     '& .MuiInput-underline:after': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
+      transition: 'border-color 0.2s ease',
     },
   },
   
@@ -29,41 +29,52 @@ export const createMuiStyles = (theme: Theme) => ({
     width: '350px',
     '& .MuiInputLabel-root': {
       color: COMMON_COLORS.secondary,
-      transition: 'color 0.3s ease',
+      transition: 'all 0.2s ease-in-out',
     },
     '& .MuiInputLabel-root.MuiInputLabel-shrink': {
       color: theme.text,
-      transition: 'color 0.3s ease',
+      transition: 'all 0.2s ease-in-out',
     },
     '& .MuiInputBase-input': {
       color: theme.text,
-      transition: 'color 0.3s ease',
-      height: '23px',
+      transition: 'all 0.2s ease-in-out',
     },
     '& .MuiInput-underline:before': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
+      transition: 'all 0.2s ease-in-out',
     },
     '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
+      transition: 'all 0.2s ease-in-out',
     },
     '& .MuiInput-underline:hover:before': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
-      },
+      transition: 'all 0.2s ease-in-out',
+    },
     '& .MuiInput-underline:after': {
       borderBottomColor: theme.text,
-      transition: 'border-color 0.3s ease',
+      transition: 'all 0.2s ease-in-out',
     },
   },
 
   addButton: {
     color: COMMON_COLORS.secondary,
-    transition: 'color 0.3s ease',
+    transition: 'all 0.2s ease-in-out',
     '&:hover': {
       color: theme.text,
-      transition: 'color 0.3s ease',
+      transition: 'all 0.2s ease-in-out',
     },
+  },
+
+  colorPickerPopover: {
+    zIndex: 9999,
+    '& .MuiPaper-root': {
+      backgroundColor: theme.secondary,
+      borderRadius: '10px',
+    },
+  },
+
+  colorPickerContainer: {
+    padding: '5px',
   },
 }); 
