@@ -3,6 +3,7 @@ export interface Task {
   text: string;
   position: { x: number; y: number };
   color: string;
+  isColorSetByUser: boolean;
 }
 export interface DraggableNoteProps extends Task {
   onDelete: (id: string) => void;

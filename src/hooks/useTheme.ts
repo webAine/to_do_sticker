@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LIGHT_THEME, DARK_THEME } from '../styles/colors';
-import { Theme } from '../types/theme';
+import { Theme } from '../types/types';
 import { getTheme, saveTheme } from '../services/localStorage';
 
 export const useTheme = () => {

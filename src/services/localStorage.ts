@@ -1,4 +1,4 @@
-import { Task } from '../types/theme';
+import { Task } from '../types/types';
 
 // Theme
 export const getTheme = () => {

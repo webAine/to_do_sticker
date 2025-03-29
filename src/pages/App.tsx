@@ -1,28 +1,57 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import { ThemeProvider } from 'styled-components';
+
 import { v4 as uuidv4 } from 'uuid';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
-import { TextField } from '@mui/material';
-import PlusIcon from '@mui/icons-material/Add';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
+import { PiPlusCircleBold, PiMoonStarsFill, PiSunDimFill } from 'react-icons/pi';
+
 import { getTasks, saveTasks } from '../services/localStorage';
 import { useTheme } from '../hooks/useTheme';
-import { Task } from '../types/theme';
+
+import { Task } from '../types/types';
+
 import { DraggableNote } from '../components/DraggableNote/DraggableNote';
-import { createMuiStyles } from '../styles/mui-styles';
+import { AddStickerInput } from '../components/AddStickerInput/AddStickerInput';
+
+import { getRandomColor, LIGHT_THEME_COLORS, DARK_THEME_COLORS } from '../styles/colors';
+import { lightTheme, darkTheme } from '../styles/theme';
 import './App.css';
-import randomColor from 'randomcolor';
 
 export const App = () => {
   const { theme, isDarkTheme, toggleTheme } = useTheme();
   const [task, setTask] = useState<string>('');
   const [tasks, setTasks] = useState<Task[]>(getTasks());
-
-  const muiStyles = useMemo(() => createMuiStyles(theme), [theme]);
+  const currentTheme = isDarkTheme ? darkTheme : lightTheme;
 
   useEffect(() => {
     saveTasks(tasks);
   }, [tasks]);
+
+  const handleThemeToggle = () => {
+    const newIsDarkTheme = !isDarkTheme;
+    
+    const updatedTasks = tasks.map(task => {
+      if (task.isColorSetByUser) {
+        return task;
+      }
+
+      const currentColors = newIsDarkTheme ? DARK_THEME_COLORS : LIGHT_THEME_COLORS;
+      const oppositeColors = newIsDarkTheme ? LIGHT_THEME_COLORS : DARK_THEME_COLORS;
+      
+      if (oppositeColors.includes(task.color)) {
+        const index = oppositeColors.indexOf(task.color);
+        return {
+          ...task,
+          color: currentColors[index] || currentColors[0],
+          isColorSetByUser: false
+        };
+      }
+      return task;
+    });
+
+    setTasks(updatedTasks);
+    toggleTheme();
+  };
 
   const handleAddTask = () => {
     if (task.trim() !== '') {
@@ -41,7 +70,8 @@ export const App = () => {
         id: uuidv4(), 
         text: task, 
         position: { x: randomX, y: randomY },
-        color: randomColor({ luminosity: isDarkTheme ? 'dark' : 'light' })
+        color: getRandomColor(isDarkTheme),
+        isColorSetByUser: false
       }]);
       setTask('');
     }
@@ -58,14 +88,14 @@ export const App = () => {
         return { 
           ...task, 
           text: newText,
-          ...(newColor ? { color: newColor } : {})
+          ...(newColor ? { color: newColor, isColorSetByUser: true } : {})
         };
       }
       return task;
     }));
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleAddTask();
     }
@@ -91,47 +121,49 @@ export const App = () => {
   };
 
   return (
-    <div className='todo-sticker' style={{ backgroundColor: theme.primary }}>
-      <div className='todo-sticker__controls'>
-        <TextField
-          sx={muiStyles.addNoteTextField}
-          variant='standard'
-          label='Add a new sticker'
-          value={task}
-          onChange={(e) => {
-            setTask(e.target.value);
-          }}
-          onKeyDown={(e) => handleKeyDown(e)}
-        />
-        <button onClick={handleAddTask}>
-          <PlusIcon sx={muiStyles.addButton} />
-        </button>
-        <button className='todo-sticker__theme-button' onClick={toggleTheme}>
-          {isDarkTheme ? (
-            <LightModeIcon sx={muiStyles.addButton} />
-          ) : (
-            <DarkModeIcon sx={muiStyles.addButton} />
-          )}
-        </button>
-      </div>
-
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className='todo-sticker__container'>
-          {tasks.map((task) => (
-            <DraggableNote
-              key={task.id}
-              id={task.id}
-              text={task.text}
-              position={task.position}
-              color={task.color}
-              onDelete={handleDeleteTask}
-              onUpdate={handleUpdateTask}
-              theme={theme}
-              isDarkTheme={isDarkTheme}
-            />
-          ))}
+    <ThemeProvider theme={currentTheme}>
+      <div className='todo-sticker' style={{ backgroundColor: theme.primary }}>
+        <div className='todo-sticker__controls'>
+          <AddStickerInput
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            onKeyDown={handleKeyDown}
+            label="Add a new sticker"
+          />
+          <button 
+            onClick={handleAddTask}
+            style={{ color: theme.text }}
+          >
+            <PiPlusCircleBold size={24} />
+          </button>
+          <button 
+            className='todo-sticker__theme-button' 
+            onClick={handleThemeToggle}
+            style={{ color: theme.text }}
+          >
+            {isDarkTheme ? (
+              <PiSunDimFill size={24} />
+            ) : (
+              <PiMoonStarsFill size={24} />
+            )}
+          </button>
         </div>
-      </DndContext>
-    </div>
+
+        <DndContext onDragEnd={handleDragEnd}>
+          <div className='todo-sticker__container'>
+            {tasks.map((task) => (
+              <DraggableNote
+                key={task.id}
+                {...task}
+                onDelete={handleDeleteTask}
+                onUpdate={handleUpdateTask}
+                theme={theme}
+                isDarkTheme={isDarkTheme}
+              />
+            ))}
+          </div>
+        </DndContext>
+      </div>
+    </ThemeProvider>
   );
 };

@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import randomColor from 'randomcolor';
-import CloseIcon from '@mui/icons-material/Close';
-import EditIcon from '@mui/icons-material/EditNote';
-import ColorLensIcon from '@mui/icons-material/ColorLens';
-import Fab from '@mui/material/Fab';
-import { TextField, Popover } from '@mui/material';
-import { DraggableNoteProps } from '../../types/theme';
-import { createMuiStyles } from '../../styles/mui-styles';
-import { createStickerStyles } from '../../styles/stickerStyles';
-import { HexColorPicker } from 'react-colorful';
+
+import { PiNotePencil, PiPaintBucket, PiX } from 'react-icons/pi';
+
+import { DraggableNoteProps } from '../../types/types';
+
+import { LIGHT_THEME_COLORS, DARK_THEME_COLORS } from '../../styles/colors';
+import { 
+  NoteWrapper,
+  Note,
+  ButtonsContainer,
+  ActionButton, 
+  ColorPickerOverlay,
+  ColorPickerPopover, 
+  ColorGrid, 
+  ColorOption,
+  TextareaContainer
+} from './styles';
+
+import { EditStickerTextarea } from '../EditStickerTextArea/EditStickerTextarea';
 
 export const DraggableNote = ({
   id,
@@ -22,16 +32,13 @@ export const DraggableNote = ({
   theme,
   isDarkTheme,
 }: DraggableNoteProps) => {
-  const [backgroundColor, setBackgroundColor] = useState<string>(color || randomColor({
-    luminosity: isDarkTheme ? 'dark' : 'light',
-  }));
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    color || (isDarkTheme ? DARK_THEME_COLORS[0] : LIGHT_THEME_COLORS[0])
+  );
   const [isHover, setIsHover] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(text);
   const [colorAnchorEl, setColorAnchorEl] = useState<null | HTMLElement>(null);
-
-  const muiStyles = createMuiStyles(theme);
-  const stickerStyles = createStickerStyles(isDarkTheme);
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
   
@@ -48,7 +55,7 @@ export const DraggableNote = ({
     onDelete(id);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       onUpdate(id, editText, backgroundColor);
       setIsEditing(false);
@@ -69,6 +76,7 @@ export const DraggableNote = ({
   const onLeave = () => {
     setIsHover(false);
     handleBlur();
+    handleColorClose();
   };
 
   const handleColorClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -84,130 +92,108 @@ export const DraggableNote = ({
     onUpdate(id, text, newColor);
   };
 
-  const style = {
-    ...stickerStyles.item,
-    ...(isHover ? stickerStyles.itemHover : {}),
-    transform: CSS.Transform.toString(transform ? {
-      x: position.x + transform.x,
-      y: position.y + transform.y,
-      scaleX: 1,
-      scaleY: 1,
-    } : {
-      x: position.x,
-      y: position.y,
-      scaleX: 1,
-      scaleY: 1,
-    }),
-    backgroundColor,
-  };
+  useEffect(() => {
+    const currentColors = isDarkTheme ? DARK_THEME_COLORS : LIGHT_THEME_COLORS;
+    const oppositeColors = isDarkTheme ? LIGHT_THEME_COLORS : DARK_THEME_COLORS;
+    
+    if (oppositeColors.includes(backgroundColor)) {
+      const index = oppositeColors.indexOf(backgroundColor);
+      const newColor = currentColors[index] || currentColors[0];
+      setBackgroundColor(newColor);
+      onUpdate(id, text, newColor);
+    }
+  }, [isDarkTheme]);
 
-  const buttonStyle = {
-    ...stickerStyles.buttons,
-    top: transform ? position.y + transform.y - 17 : position.y - 17,
-    left: transform ? position.x + transform.x + 170 : position.x + 170,
-    opacity: isHover ? 1 : 0,
-    transform: isHover ? 'translateY(0)' : 'translateY(100%)',
-  };
+  const transformString = CSS.Transform.toString(transform ? {
+    x: position.x + transform.x,
+    y: position.y + transform.y,
+    scaleX: 1,
+    scaleY: 1,
+  } : {
+    x: position.x,
+    y: position.y,
+    scaleX: 1,
+    scaleY: 1,
+  }) || '';
 
   return (
-    <div style={stickerStyles.list} onMouseEnter={onHover} onMouseLeave={onLeave}>
-      <div
+    <NoteWrapper onMouseEnter={onHover} onMouseLeave={onLeave}>
+      <Note
         ref={setNodeRef}
         {...listeners}
         {...attributes}
-        style={style}
-        onKeyDown={handleKeyDown}
+        $isHover={isHover}
+        $isDarkTheme={isDarkTheme}
+        $transform={transformString}
+        $backgroundColor={backgroundColor}
       >
         {isEditing ? (
-          <div>
-            <TextField
-              multiline
-              fullWidth
+          <TextareaContainer>
+            <EditStickerTextarea
               value={editText}
-              onChange={(e) => handleChangeText(e.target.value)}
+              onChange={handleChangeText}
               onBlur={handleBlur}
-              variant='standard'
-              sx={muiStyles.noteTextField}
+              onKeyDown={handleKeyDown}
             />
-          </div>
+          </TextareaContainer>
         ) : (
           <p style={{ color: theme.text }}>{text}</p>
         )}
-        <div style={stickerStyles.itemAfter} />
-      </div>
+      </Note>
 
-      <div
-        style={buttonStyle}
+      <ButtonsContainer 
+        $isHover={isHover}
+        $position={{
+          x: transform ? position.x + transform.x : position.x,
+          y: transform ? position.y + transform.y : position.y
+        }}
       >
-        <Fab
-          size='small'
-          color='secondary'
-          aria-label='edit'
+        <ActionButton
+          $variant="edit"
           onClick={handleEditText}
-          sx={{
-            width: 26,
-            height: 26,
-            minHeight: 26,
-            '& .MuiSvgIcon-root': {
-              width: 18,
-              height: 18,
-            },
-          }}
         >
-          <EditIcon />
-        </Fab>
+          <PiNotePencil />
+        </ActionButton>
 
-        <Fab
-          size='small'
-          color='primary'
-          aria-label='change color'
+        <ActionButton
+          $variant="color"
           onClick={handleColorClick}
-          sx={{
-            width: 26,
-            height: 26,
-            minHeight: 26,
-            '& .MuiSvgIcon-root': {
-              width: 18,
-              height: 18,
-            },
-          }}
         >
-          <ColorLensIcon />
-        </Fab>
+          <PiPaintBucket />
+        </ActionButton>
 
-        <Popover
-          open={Boolean(colorAnchorEl)}
-          anchorEl={colorAnchorEl}
-          onClose={handleColorClose}
-          marginThreshold={0}
-          anchorReference="anchorPosition"
-          anchorPosition={{ top: 290, left: 260}}
-          sx={muiStyles.colorPickerPopover}
+        <ColorPickerOverlay 
+          $isOpen={Boolean(colorAnchorEl)} 
+          onClick={handleColorClose}
+        />
+        
+        <ColorPickerPopover
+          $isOpen={Boolean(colorAnchorEl)}
         >
-          <div style={muiStyles.colorPickerContainer}>
-            <HexColorPicker color={backgroundColor} onChange={handleColorChange} />
-          </div>
-        </Popover>
+          <ColorGrid>
+            {(isDarkTheme ? DARK_THEME_COLORS : LIGHT_THEME_COLORS).map((color, index) => (
+              <ColorOption
+                key={index}
+                $color={color}
+                $isSelected={backgroundColor === color}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleColorChange(color);
+                  handleColorClose();
+                }}
+              />
+            ))}
+          </ColorGrid>
+        </ColorPickerPopover>
 
-        <Fab
-          size='small'
-          color='error'
-          aria-label='delete'
+        <ActionButton
+          $variant="delete"
           onClick={handleDelete}
-          sx={{
-            width: 26,
-            height: 26,
-            minHeight: 26,
-            '& .MuiSvgIcon-root': {
-              width: 18,
-              height: 18,
-            },
-          }}
         >
-          <CloseIcon />
-        </Fab>
-      </div>
-    </div>
+          <PiX />
+        </ActionButton>
+      </ButtonsContainer>
+    </NoteWrapper>
   );
 };
 
