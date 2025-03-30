@@ -40,8 +40,25 @@ export const DraggableNote = ({
   const [editText, setEditText] = useState(text);
   const [colorAnchorEl, setColorAnchorEl] = useState<null | HTMLElement>(null);
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+  const { attributes, listeners: originalListeners, setNodeRef, transform } = useDraggable({ 
+    id,
+  });
   
+  const listeners = {
+    ...originalListeners,
+    onMouseDown: (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (originalListeners && originalListeners.onMouseDown) {
+        originalListeners.onMouseDown(e);
+      }
+    },
+    onTouchStart: (e: React.TouchEvent) => {
+      e.stopPropagation();
+      if (originalListeners && originalListeners.onTouchStart) {
+        originalListeners.onTouchStart(e);
+      }
+    }
+  };
 
   const handleEditText = () => {
     setIsEditing(true);

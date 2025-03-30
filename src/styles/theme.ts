@@ -23,7 +23,6 @@ export interface Theme {
   };
 }
 
-// Расширяем тип DefaultTheme из styled-components
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
 }

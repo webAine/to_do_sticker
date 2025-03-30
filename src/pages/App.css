@@ -1,3 +1,9 @@
+.app {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
 .todo-sticker {
   display: flex;
   align-items: center;
@@ -5,7 +11,7 @@
   width: 100%;
   height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: background-color 0.3s ease;
 }
 .todo-sticker__container {
@@ -14,7 +20,7 @@
   left: 0;
   width: 100%;
   height: calc(100% - 60px);
-  overflow: hidden;
+  overflow: visible;
 }
 .todo-sticker__input, 
 .todo-sticker__button {
@@ -24,13 +30,19 @@
 .todo-sticker__controls {
   display: flex;
   align-items: center;
+  justify-content: center;
   z-index: 2000;
   padding: 10px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 15px;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+  pointer-events: auto;
 }
 .todo-sticker__theme-button {
-  position: absolute;
-  bottom: 2%;
-  right: 2%;
   z-index: 2000;
 }
 

@@ -1,11 +1,5 @@
+import { EditStickerTextareaProps } from '../../types/types';
 import { StyledTextarea } from './styles';
-
-interface EditStickerTextareaProps {
-  value: string;
-  onChange: (value: string) => void;
-  onBlur: () => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-}
 
 export const EditStickerTextarea = ({ 
   value, 

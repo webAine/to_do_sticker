@@ -8,6 +8,7 @@ export const InputWrapper = styled.div`
 export const StyledLabel = styled.label<{ $hasValue: boolean }>`
   position: absolute;
   left: 0;
+  width: 100%;
   top: ${props => props.$hasValue ? '-20px' : '0'};
   color: ${props => props.theme.colors.text};
   transition: ${props => props.theme.transitions.default};
