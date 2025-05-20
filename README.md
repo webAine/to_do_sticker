@@ -3,7 +3,7 @@
 An interactive task management app featuring draggable sticky notes with zoom and pan support. Built with React and TypeScript using modern libraries for a smooth and user-friendly experience.
 
 ## 🚀 Getting Started
-
+```bash
 1. Clone the repository:
 git clone https://github.com/webAine/to_do_sticker.git
 cd to_do_sticker
