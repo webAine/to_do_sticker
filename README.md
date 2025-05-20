@@ -5,8 +5,6 @@ An interactive task management app featuring draggable sticky notes with zoom an
 ## 🚀 Getting Started
 
 1. Clone the repository:
-
-```bash
 git clone https://github.com/webAine/to_do_sticker.git
 cd to_do_sticker
 
