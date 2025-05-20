@@ -1,54 +1,47 @@
-# React + TypeScript + Vite
+# To-Do Sticker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive task management app featuring draggable sticky notes with zoom and pan support. Built with React and TypeScript using modern libraries for a smooth and user-friendly experience.
 
-Currently, two official plugins are available:
+## 🚀 Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Clone the repository:
 
-## Expanding the ESLint configuration
+```bash
+git clone https://github.com/webAine/to_do_sticker.git
+cd to_do_sticker
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+    Install dependencies:
+npm install
+    Run the development server:
+npm run dev
+The app will be available at http://localhost:5173.
+🧰 Technologies Used
+    React 18
+    TypeScript
+    Vite
+    Material UI (MUI) for components and icons
+    styled-components and Emotion for styling
+    @dnd-kit/core for drag-and-drop functionality
+    react-zoom-pan-pinch for zooming and panning
+    uuid for generating unique IDs
+    ESLint for code quality and linting
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+⚙️ Key Features
+    Create, edit, and delete tasks as sticky notes
+    Drag and drop tasks to rearrange them
+    Zoom and pan the task board area
+    Responsive and modern UI design
+    Data persistence using local storage
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+📂 Project Structure
+    src/components/ — reusable components
+    src/pages/ — application pages
+    src/App.tsx — root React component
+    src/main.tsx — app entry point
+    Vite, ESLint, and TypeScript configurations in the project root
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+📈 Future Improvements
+    Cloud sync and backup of tasks
+    User authentication
+    Task reminders and notifications
+    Dark mode and UI customization options
