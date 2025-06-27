@@ -3,17 +3,21 @@
 An interactive task management app featuring draggable sticky notes with zoom and pan support. Built with React and TypeScript using modern libraries for a smooth and user-friendly experience.
 
 ## 🚀 Getting Started
-```bash
-1. Clone the repository:
+
+### 1. Clone the repository:
 git clone https://github.com/webAine/to_do_sticker.git
+
 cd to_do_sticker
 
-2. Install dependencies:
-npm install
-3. Run the development server:
-npm run dev
-The app will be available at http://localhost:5173.
+### 2. Install dependencies:
 
+npm install
+
+### 3. Run the development server:
+npm run dev
+
+The app will be available at http://localhost:5173.
+```bash
 🧰 Technologies Used
     React 18
     TypeScript
